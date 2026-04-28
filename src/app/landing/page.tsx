@@ -1,5 +1,3 @@
-'use client';
-
 import Hero from '@/components/hero';
 import Features from '@/components/features';
 import Testimonials from '@/components/testimonials';
@@ -26,8 +24,8 @@ export default function LandingPage() {
         body {
           margin: 0;
           padding: 0;
-          background-color: var(--bg-color, #0a0a0f);
-          color: var(--text-color, #ffffff);
+          background-color: #0a0a0f;
+          color: #ffffff;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
             sans-serif;
           overflow-x: hidden;
@@ -55,7 +53,7 @@ export default function LandingPage() {
         }
 
         ::-webkit-scrollbar-track {
-          background: var(--bg-color, #0a0a0f);
+          background: #0a0a0f;
         }
 
         ::-webkit-scrollbar-thumb {
@@ -70,7 +68,7 @@ export default function LandingPage() {
         /* Selection styling */
         ::selection {
           background: rgba(232, 62, 140, 0.3);
-          color: var(--text-color, #ffffff);
+          color: #ffffff;
         }
 
         /* Focus styles */
