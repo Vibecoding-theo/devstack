@@ -23,6 +23,8 @@ export default function AppPage() {
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [notification, setNotification] = useState<string | null>(null);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     initGroqFromStorage();
@@ -134,6 +136,40 @@ export default function AppPage() {
     }
   };
 
+  const handleToggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleSelectAll = () => {
+    setSelectedIds(new Set(filteredComponents.map(c => c.id)));
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedIds(new Set());
+  };
+
+  const handleBulkDelete = () => {
+    const count = selectedIds.size;
+    if (count === 0) return;
+    if (confirm(`Êtes-vous sûr de vouloir supprimer ${count} composant${count > 1 ? 's' : ''} ?`)) {
+      storage.deleteMultipleComponents(Array.from(selectedIds));
+      setSelectedIds(new Set());
+      setSelectionMode(false);
+      loadComponents();
+      showNotification(`${count} composant${count > 1 ? 's' : ''} supprimé${count > 1 ? 's' : ''}`);
+    }
+  };
+
+  const handleToggleSelectionMode = () => {
+    setSelectionMode(prev => !prev);
+    setSelectedIds(new Set());
+  };
+
   const handleCancel = () => {
     setShowForm(false);
     setEditingId(null);
@@ -229,6 +265,13 @@ export default function AppPage() {
           onViewModeChange={setViewMode}
           onNew={() => setShowForm(true)}
           onSmartImport={() => setShowSmartImport(true)}
+          selectionMode={selectionMode}
+          selectedCount={selectedIds.size}
+          totalCount={filteredComponents.length}
+          onToggleSelectionMode={handleToggleSelectionMode}
+          onSelectAll={handleSelectAll}
+          onDeselectAll={handleDeselectAll}
+          onBulkDelete={handleBulkDelete}
         />
 
         {components.length === 0 ? (
@@ -240,6 +283,9 @@ export default function AppPage() {
             onEdit={handleEdit}
             onDelete={handleDelete}
             viewMode={viewMode}
+            selectionMode={selectionMode}
+            selectedIds={selectedIds}
+            onToggleSelect={handleToggleSelect}
           />
         )}
       </main>

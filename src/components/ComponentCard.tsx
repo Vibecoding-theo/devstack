@@ -9,6 +9,9 @@ interface ComponentCardProps {
   onView: (id: string) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  selectionMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
 const LANGUAGE_COLORS: Record<string, string> = {
@@ -44,7 +47,7 @@ const COLOR_CLASSES = {
   purple: { bg: 'text-purple-600 dark:text-purple-400' }
 } as const;
 
-export default function ComponentCard({ component, onView, onEdit, onDelete }: ComponentCardProps) {
+export default function ComponentCard({ component, onView, onEdit, onDelete, selectionMode, selected, onToggleSelect }: ComponentCardProps) {
   const [showPrompts, setShowPrompts] = useState(false);
 
   const copyToClipboard = (text: string, onSuccess: () => void) => {
@@ -73,7 +76,30 @@ export default function ComponentCard({ component, onView, onEdit, onDelete }: C
   const languageColor = LANGUAGE_COLORS[component.language] || LANGUAGE_COLORS.other;
 
   return (
-    <article className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col">
+    <article
+      className={`bg-white dark:bg-gray-800 rounded-xl border shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col relative ${
+        selected
+          ? 'border-red-500 dark:border-red-400 ring-2 ring-red-500/30'
+          : 'border-gray-200 dark:border-gray-700'
+      }`}
+      onClick={selectionMode ? () => onToggleSelect?.(component.id) : undefined}
+      style={selectionMode ? { cursor: 'pointer' } : undefined}
+    >
+      {selectionMode && (
+        <div className="absolute top-3 left-3 z-10">
+          <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${
+            selected
+              ? 'bg-red-500 border-red-500'
+              : 'border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700'
+          }`}>
+            {selected && (
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+        </div>
+      )}
       <div className="p-4 flex-1 flex flex-col">
         <div className="flex items-start justify-between gap-2 mb-3">
           <div className="flex-1 min-w-0">
@@ -83,6 +109,7 @@ export default function ComponentCard({ component, onView, onEdit, onDelete }: C
             </span>
           </div>
           <div className="flex gap-1 flex-shrink-0">
+            {!selectionMode && (<>
             <button
               onClick={() => onView(component.id)}
               className="p-1.5 text-gray-500 hover:text-purple-600 dark:text-gray-400 dark:hover:text-purple-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
@@ -113,6 +140,7 @@ export default function ComponentCard({ component, onView, onEdit, onDelete }: C
                 {ICONS.trash}
               </svg>
             </button>
+            </>)}
           </div>
         </div>
 
@@ -179,6 +207,7 @@ export default function ComponentCard({ component, onView, onEdit, onDelete }: C
         </div>
       )}
 
+      {!selectionMode && (
       <div className="border-t border-gray-200 dark:border-gray-700 p-3 grid grid-cols-2 gap-2">
         <button
           onClick={() => onView(component.id)}
@@ -201,6 +230,7 @@ export default function ComponentCard({ component, onView, onEdit, onDelete }: C
           <span>Copier</span>
         </button>
       </div>
+      )}
     </article>
   );
 }

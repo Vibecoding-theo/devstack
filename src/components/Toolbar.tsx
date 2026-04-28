@@ -8,9 +8,16 @@ interface ToolbarProps {
   onViewModeChange: (mode: 'grid' | 'list') => void;
   onNew: () => void;
   onSmartImport?: () => void;
+  selectionMode?: boolean;
+  selectedCount?: number;
+  totalCount?: number;
+  onToggleSelectionMode?: () => void;
+  onSelectAll?: () => void;
+  onDeselectAll?: () => void;
+  onBulkDelete?: () => void;
 }
 
-export default function Toolbar({ onSearch, viewMode, onViewModeChange, onNew, onSmartImport }: ToolbarProps) {
+export default function Toolbar({ onSearch, viewMode, onViewModeChange, onNew, onSmartImport, selectionMode, selectedCount = 0, totalCount = 0, onToggleSelectionMode, onSelectAll, onDeselectAll, onBulkDelete }: ToolbarProps) {
   return (
     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8">
       <div className="flex-1 min-w-0">
@@ -65,6 +72,56 @@ export default function Toolbar({ onSearch, viewMode, onViewModeChange, onNew, o
           </svg>
           <span className="hidden sm:inline">Nouveau</span>
         </button>
+        {selectionMode ? (
+          <>
+            <button
+              onClick={selectedCount === totalCount ? onDeselectAll : onSelectAll}
+              className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              title={selectedCount === totalCount ? 'Tout désélectionner' : 'Tout sélectionner'}
+              aria-label={selectedCount === totalCount ? 'Tout désélectionner' : 'Tout sélectionner'}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </button>
+            <button
+              onClick={onBulkDelete}
+              disabled={selectedCount === 0}
+              className={`flex items-center gap-2 px-3 py-2 font-medium rounded-lg transition-colors whitespace-nowrap ${
+                selectedCount > 0
+                  ? 'bg-red-600 hover:bg-red-700 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+              }`}
+              aria-label={`Supprimer ${selectedCount} composant${selectedCount > 1 ? 's' : ''}`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              {selectedCount > 0 && <span className="text-sm">{selectedCount}</span>}
+            </button>
+            <button
+              onClick={onToggleSelectionMode}
+              className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              title="Annuler la sélection"
+              aria-label="Annuler la sélection"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={onToggleSelectionMode}
+            className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            title="Sélection multiple"
+            aria-label="Sélection multiple"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+          </button>
+        )}
       </div>
     </div>
   );

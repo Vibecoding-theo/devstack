@@ -9,9 +9,12 @@ interface ComponentGridProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   viewMode: 'grid' | 'list';
+  selectionMode?: boolean;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
 }
 
-export default function ComponentGrid({ components, onView, onEdit, onDelete, viewMode }: ComponentGridProps) {
+export default function ComponentGrid({ components, onView, onEdit, onDelete, viewMode, selectionMode, selectedIds, onToggleSelect }: ComponentGridProps) {
   if (components.length === 0) {
     return (
       <div className="text-center py-12 sm:py-16 px-4">
@@ -43,6 +46,9 @@ export default function ComponentGrid({ components, onView, onEdit, onDelete, vi
             onView={onView}
             onEdit={onEdit}
             onDelete={onDelete}
+            selectionMode={selectionMode}
+            selected={selectedIds?.has(component.id)}
+            onToggleSelect={onToggleSelect}
           />
         ))}
       </div>

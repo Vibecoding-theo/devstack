@@ -40,6 +40,12 @@ export const storage = {
     this.saveComponents(components);
   },
 
+  deleteMultipleComponents(ids: string[]): void {
+    const idSet = new Set(ids);
+    const components = this.getComponents().filter(c => !idSet.has(c.id));
+    this.saveComponents(components);
+  },
+
   exportComponents(): string {
     return JSON.stringify(this.getComponents(), null, 2);
   },
