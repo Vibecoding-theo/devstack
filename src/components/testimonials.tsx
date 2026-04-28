@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 
-export default function Testimonials() {
+export default function Testimonials({ id }: { id?: string }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const testimonials = [
@@ -52,7 +52,7 @@ export default function Testimonials() {
   ];
 
   return (
-    <section className="testimonials-section">
+    <section id={id} className="testimonials-section">
       <div className="noise-overlay-testimonials" />
 
       <div className="testimonials-container">

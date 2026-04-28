@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 
-export default function Pricing() {
+export default function Pricing({ id }: { id?: string }) {
   const [isYearly, setIsYearly] = useState(false);
 
   const plans = [
@@ -53,7 +53,7 @@ export default function Pricing() {
   ];
 
   return (
-    <section className="pricing-section">
+    <section id={id} className="pricing-section">
       <div className="noise-overlay-pricing" />
 
       <div className="pricing-container">

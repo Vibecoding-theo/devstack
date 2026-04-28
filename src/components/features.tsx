@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 
-export default function Features() {
+export default function Features({ id }: { id?: string }) {
   const [activeTab, setActiveTab] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -64,7 +64,7 @@ export default function Features() {
   ];
 
   return (
-    <section className="features-section">
+    <section id={id} className="features-section">
       <div className="noise-overlay-features" />
 
       <div className="features-container">
