@@ -1,11 +1,11 @@
 'use client';
 
-import Hero from '@/components/Hero';
-import Features from '@/components/Features';
-import Testimonials from '@/components/Testimonials';
-import Pricing from '@/components/Pricing';
-import CTA from '@/components/CTA';
-import Footer from '@/components/Footer';
+import Hero from '@/components/hero';
+import Features from '@/components/features';
+import Testimonials from '@/components/testimonials';
+import Pricing from '@/components/pricing';
+import CTA from '@/components/cta';
+import Footer from '@/components/footer';
 import HeaderLP from '@/components/HeaderLP';
 import './landing.css';
 
