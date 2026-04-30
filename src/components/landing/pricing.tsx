@@ -1,9 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
+import { useAuth } from '@/lib/useAuth';
 
 export default function Pricing({ id }: { id?: string }) {
   const [isYearly, setIsYearly] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const ctaHref = isAuthenticated ? '/app' : '/auth';
 
   const plans = [
     {
@@ -136,11 +140,12 @@ export default function Pricing({ id }: { id?: string }) {
                 ))}
               </ul>
 
-              <button
+              <Link
+                href={ctaHref}
                 className={`plan-cta ${plan.popular ? 'primary' : 'secondary'}`}
               >
                 {plan.cta}
-              </button>
+              </Link>
             </div>
           ))}
         </div>

@@ -2,11 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/lib/useAuth';
 
 export default function HeaderLP() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  const { isAuthenticated } = useAuth();
+
+  const ctaHref = isAuthenticated ? '/app' : '/auth';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,7 +66,6 @@ export default function HeaderLP() {
           <a href="#features">Fonctionnalités</a>
           <a href="#testimonials">Témoignages</a>
           <a href="#pricing">Tarifs</a>
-          <a href="#resources">Ressources</a>
         </nav>
 
         {/* Header Actions */}
@@ -70,8 +73,8 @@ export default function HeaderLP() {
           <button className="theme-toggle" aria-label="Toggle theme" onClick={toggleTheme}>
             {isDark ? '☀' : '☾'}
           </button>
-          <Link href="/auth" className="btn-login">Connexion</Link>
-          <Link href="/auth" className="btn-new">Nouveau composant +</Link>
+          <Link href={ctaHref} className="btn-login">{isAuthenticated ? 'Mes composants' : 'Connexion'}</Link>
+          <Link href={ctaHref} className="btn-new">Nouveau composant +</Link>
 
           {/* Mobile Menu Toggle */}
           <button
@@ -109,16 +112,10 @@ export default function HeaderLP() {
           >
             Tarifs
           </a>
-          <a
-            href="#resources"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Ressources
-          </a>
         </nav>
         <div className="mobile-actions">
-          <Link href="/auth" className="btn-login-mobile" onClick={() => setIsMobileMenuOpen(false)}>Connexion</Link>
-          <Link href="/auth" className="btn-new-mobile" onClick={() => setIsMobileMenuOpen(false)}>Nouveau composant +</Link>
+          <Link href={ctaHref} className="btn-login-mobile" onClick={() => setIsMobileMenuOpen(false)}>{isAuthenticated ? 'Mes composants' : 'Connexion'}</Link>
+          <Link href={ctaHref} className="btn-new-mobile" onClick={() => setIsMobileMenuOpen(false)}>Nouveau composant +</Link>
         </div>
       </div>
 

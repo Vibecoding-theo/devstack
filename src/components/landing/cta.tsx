@@ -2,8 +2,12 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/lib/useAuth';
 
 export default function CTA() {
+  const { isAuthenticated } = useAuth();
+  const ctaHref = isAuthenticated ? '/app' : '/auth';
+
   return (
     <section className="cta-section">
       <div className="noise-overlay-cta" />
@@ -31,7 +35,7 @@ export default function CTA() {
           </p>
 
           <div className="cta-buttons">
-            <Link href="/app" className="btn-cta-primary">
+            <Link href={ctaHref} className="btn-cta-primary">
               Commencer gratuitement
               <span className="btn-arrow">→</span>
             </Link>

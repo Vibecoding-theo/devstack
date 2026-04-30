@@ -2,8 +2,11 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/lib/useAuth';
 
 export default function Hero() {
+  const { isAuthenticated } = useAuth();
+  const ctaHref = isAuthenticated ? '/app' : '/auth';
 
   return (
     <>
@@ -33,7 +36,7 @@ export default function Hero() {
             </p>
 
             <div className="hero-buttons">
-              <Link href="/auth" className="btn-primary">Explorer mes composants →</Link>
+              <Link href={ctaHref} className="btn-primary">Explorer mes composants →</Link>
               <button className="btn-secondary">Voir comment ça marche</button>
             </div>
 
