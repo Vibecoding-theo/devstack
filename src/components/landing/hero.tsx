@@ -33,7 +33,7 @@ export default function Hero() {
             </p>
 
             <div className="hero-buttons">
-              <Link href="/app" className="btn-primary">Explorer mes composants →</Link>
+              <Link href="/auth" className="btn-primary">Explorer mes composants →</Link>
               <button className="btn-secondary">Voir comment ça marche</button>
             </div>
 

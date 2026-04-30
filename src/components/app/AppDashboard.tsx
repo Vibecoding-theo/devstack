@@ -11,9 +11,9 @@ import EmptyState from '@/components/app/EmptyState';
 import ComponentDetail from '@/components/app/ComponentDetail';
 import SmartImportDialog from '@/components/app/SmartImportDialog';
 import ApiKeyDialog from '@/components/app/ApiKeyDialog';
-import '../app.css';
+import '@/app/app.css';
 
-export default function AppPage() {
+export default function AppDashboard() {
   const [components, setComponents] = useState<Component[]>([]);
   const [filteredComponents, setFilteredComponents] = useState<Component[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,7 +78,7 @@ export default function AppPage() {
       count++;
     });
     loadComponents();
-    showNotif(`${count} composant${count > 1 ? 's' : ''} import\u00e9${count > 1 ? 's' : ''}`);
+    showNotif(`${count} composant${count > 1 ? 's' : ''} importé${count > 1 ? 's' : ''}`);
   };
 
   const handleDelete = (id: string) => {
@@ -86,7 +86,7 @@ export default function AppPage() {
       storage.deleteComponent(id);
       loadComponents();
       setViewingId(null);
-      showNotif('Composant supprim\u00e9');
+      showNotif('Composant supprimé');
     }
   };
 

@@ -70,8 +70,8 @@ export default function HeaderLP() {
           <button className="theme-toggle" aria-label="Toggle theme" onClick={toggleTheme}>
             {isDark ? '☀' : '☾'}
           </button>
-          <Link href="/app" className="btn-login">Connexion</Link>
-          <Link href="/app" className="btn-new">Nouveau composant +</Link>
+          <Link href="/auth" className="btn-login">Connexion</Link>
+          <Link href="/auth" className="btn-new">Nouveau composant +</Link>
 
           {/* Mobile Menu Toggle */}
           <button
@@ -117,8 +117,8 @@ export default function HeaderLP() {
           </a>
         </nav>
         <div className="mobile-actions">
-          <Link href="/app" className="btn-login-mobile" onClick={() => setIsMobileMenuOpen(false)}>Connexion</Link>
-          <Link href="/app" className="btn-new-mobile" onClick={() => setIsMobileMenuOpen(false)}>Nouveau composant +</Link>
+          <Link href="/auth" className="btn-login-mobile" onClick={() => setIsMobileMenuOpen(false)}>Connexion</Link>
+          <Link href="/auth" className="btn-new-mobile" onClick={() => setIsMobileMenuOpen(false)}>Nouveau composant +</Link>
         </div>
       </div>
 
