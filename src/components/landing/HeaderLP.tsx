@@ -3,12 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/useAuth';
+import { useTheme } from '@/lib/useTheme';
 
 export default function HeaderLP() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState(true);
   const { isAuthenticated } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
 
   const ctaHref = isAuthenticated ? '/app' : '/auth';
 
@@ -20,37 +21,6 @@ export default function HeaderLP() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-    // Update document body for global theme
-    if (!isDark) {
-      document.documentElement.style.setProperty('--bg-color', '#0a0a0f');
-      document.documentElement.style.setProperty('--text-color', '#ffffff');
-      document.documentElement.style.setProperty('--text-secondary', 'rgba(255, 255, 255, 0.85)');
-      document.documentElement.style.setProperty('--border-color', 'rgba(147, 51, 234, 0.15)');
-    } else {
-      document.documentElement.style.setProperty('--bg-color', '#ffffff');
-      document.documentElement.style.setProperty('--text-color', '#1a1a1f');
-      document.documentElement.style.setProperty('--text-secondary', 'rgba(26, 26, 31, 0.75)');
-      document.documentElement.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.1)');
-    }
-  };
-
-  useEffect(() => {
-    // Initialize theme on mount
-    if (isDark) {
-      document.documentElement.style.setProperty('--bg-color', '#0a0a0f');
-      document.documentElement.style.setProperty('--text-color', '#ffffff');
-      document.documentElement.style.setProperty('--text-secondary', 'rgba(255, 255, 255, 0.85)');
-      document.documentElement.style.setProperty('--border-color', 'rgba(147, 51, 234, 0.15)');
-    } else {
-      document.documentElement.style.setProperty('--bg-color', '#ffffff');
-      document.documentElement.style.setProperty('--text-color', '#1a1a1f');
-      document.documentElement.style.setProperty('--text-secondary', 'rgba(26, 26, 31, 0.75)');
-      document.documentElement.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.1)');
-    }
-  }, [isDark]);
 
   return (
     <header className={`header-lp ${isScrolled ? 'scrolled' : ''} ${isDark ? 'dark' : 'light'}`}>

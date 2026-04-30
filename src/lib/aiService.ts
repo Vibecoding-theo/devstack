@@ -194,6 +194,10 @@ export async function generatePromptWithAI(component: { name: string; descriptio
           role: 'system',
           content: `Tu es un expert en développement web. Génère un prompt détaillé pour aider un développeur à intégrer ce composant dans son projet.
 
+Contraintes obligatoires à inclure dans le prompt :
+- **Intégration** : Adapte automatiquement le composant à l'architecture de ce projet. Assure-toi que le composant est fonctionnel sans casser le reste de l'application. Gère correctement les imports, exports et dépendances.
+- **Design & UI** : Reste bien dans le thème, le visuel et les couleurs de ce projet actuel. Le composant doit être responsive, toujours performant et scalable.
+
 Le prompt doit inclure :
 1. Comment utiliser le composant (étape par étape)
 2. Comment le rendre réutilisable et scalable
@@ -241,6 +245,12 @@ ${component.description}
 \`\`\`${component.language}
 ${component.code}
 \`\`\`
+
+**Contraintes d'intégration :**
+Intègre ce composant dans ce projet en respectant les contraintes suivantes :
+
+- **Intégration** : Adapte automatiquement le composant à l'architecture de ce projet. Assure-toi que le composant est fonctionnel sans casser le reste de l'application. Gère correctement les imports, exports et dépendances.
+- **Design & UI** : Reste bien dans le thème, le visuel et les couleurs de ce projet actuel. Le composant doit être responsive, toujours performant et scalable.
 
 **Ta tâche :**
 1. Explique-moi comment utiliser ce composant dans mon projet

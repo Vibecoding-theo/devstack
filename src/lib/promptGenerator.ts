@@ -28,6 +28,12 @@ ${component.code}
 ${deps}
 ${tags}
 
+**Contraintes d'intégration :**
+Intègre ce composant dans ce projet en respectant les contraintes suivantes :
+
+- **Intégration** : Adapte automatiquement le composant à l'architecture de ce projet. Assure-toi que le composant est fonctionnel sans casser le reste de l'application. Gère correctement les imports, exports et dépendances.
+- **Design & UI** : Reste bien dans le thème, le visuel et les couleurs de ce projet actuel. Le composant doit être responsive, toujours performant et scalable.
+
 **Ta tâche :**
 1. Explique-moi comment utiliser ce composant dans mon projet (étape par étape)
 2. Indique-moi comment le rendre réutilisable et scalable (props, configuration, etc.)
