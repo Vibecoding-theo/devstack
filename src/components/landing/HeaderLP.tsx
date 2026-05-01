@@ -3,13 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/useAuth';
-import { useTheme } from '@/lib/useTheme';
 
 export default function HeaderLP() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isAuthenticated } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
 
   const ctaHref = isAuthenticated ? '/app' : '/auth';
 
@@ -23,7 +21,7 @@ export default function HeaderLP() {
   }, []);
 
   return (
-    <header className={`header-lp ${isScrolled ? 'scrolled' : ''} ${isDark ? 'dark' : 'light'}`}>
+    <header className={`header-lp ${isScrolled ? 'scrolled' : ''} dark`}>
       <div className="header-container">
         {/* Logo */}
         <a href="/" onClick={(e) => { e.preventDefault(); window.location.href = '/'; }} className="logo">
@@ -40,9 +38,6 @@ export default function HeaderLP() {
 
         {/* Header Actions */}
         <div className="header-actions">
-          <button className="theme-toggle" aria-label="Toggle theme" onClick={toggleTheme}>
-            {isDark ? '☀' : '☾'}
-          </button>
           <Link href={ctaHref} className="btn-login">{isAuthenticated ? 'Mes composants' : 'Connexion'}</Link>
           <Link href={ctaHref} className="btn-new">Nouveau composant +</Link>
 
