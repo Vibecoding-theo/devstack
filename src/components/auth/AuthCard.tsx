@@ -9,21 +9,13 @@ type AuthMode = 'login' | 'signup';
 interface AuthCardProps {
   mode: AuthMode;
   onModeChange: (mode: AuthMode) => void;
-  onSubmit: (data: { name?: string; email: string; password: string }) => void;
-  loading: boolean;
-  error: string;
-  success: boolean;
+  redirect: string;
+  error?: string;
 }
 
-export default function AuthCard({ mode, onModeChange, onSubmit, loading, error, success }: AuthCardProps) {
+export default function AuthCard({ mode, onModeChange, redirect, error }: AuthCardProps) {
   return (
     <div className="auth-card">
-      {success && (
-        <div className="auth-success">
-          <div className="auth-success-icon">✓</div>
-        </div>
-      )}
-
       <div className="auth-logo">
         <Link href="/">
           <span className="logo-dev">Dev</span>
@@ -46,9 +38,7 @@ export default function AuthCard({ mode, onModeChange, onSubmit, loading, error,
         </button>
       </div>
 
-      <AuthForm mode={mode} onSubmit={onSubmit} loading={loading} />
-
-      {error && <div className="auth-error">{error}</div>}
+      <AuthForm mode={mode} redirect={redirect} error={error} />
 
       <div className="auth-footer">
         <Link href="/">← Retour à l&apos;accueil</Link>

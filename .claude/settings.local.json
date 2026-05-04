@@ -7,7 +7,9 @@
       "Bash(npx tsc:*)",
       "Bash(rm:*)",
       "Bash(mkdir:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(source:*)",
+      "Bash(node:*)"
     ]
   }
 }

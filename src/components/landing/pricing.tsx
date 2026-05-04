@@ -1,60 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/useAuth';
 
 export default function Pricing({ id }: { id?: string }) {
-  const [isYearly, setIsYearly] = useState(false);
-  const { isAuthenticated } = useAuth();
-  const ctaHref = isAuthenticated ? '/app' : '/auth';
+  const { isAuthenticated, role } = useAuth();
 
-  const plans = [
-    {
-      name: 'Starter',
-      description: 'Parfait pour découvrir',
-      price: { monthly: 0, yearly: 0 },
-      features: [
-        '100 composants',
-        'Import manuel',
-        '1 collection',
-        'Support email',
-      ],
-      cta: 'Commencer gratuitement',
-      popular: false,
-    },
-    {
-      name: 'Pro',
-      description: 'Pour les développeurs sérieux',
-      price: { monthly: 9, yearly: 7 },
-      features: [
-        'Composants illimités',
-        'Import intelligent IA',
-        'Collections illimitées',
-        'Génération par IA',
-        'Export en tout format',
-        'Support prioritaire',
-      ],
-      cta: 'Essai gratuit 14 jours',
-      popular: true,
-    },
-    {
-      name: 'Team',
-      description: 'Pour les équipes qui collaborent',
-      price: { monthly: 29, yearly: 24 },
-      features: [
-        'Tout dans Pro',
-        '5 membres inclus',
-        'Collaboration en temps réel',
-        'Administration avancée',
-        'SSO & Sécurité',
-        'API access',
-        'Support dédié',
-      ],
-      cta: 'Contacter les ventes',
-      popular: false,
-    },
-  ];
+  const freeCtaHref = isAuthenticated ? '/app' : '/auth?redirect=/app';
+
+  const premiumCtaHref = isAuthenticated ? '/payment' : '/auth?redirect=/payment';
 
   return (
     <section id={id} className="pricing-section">
@@ -74,116 +29,139 @@ export default function Pricing({ id }: { id?: string }) {
           </h2>
 
           <p className="pricing-description">
-            Commence gratuitement, évolue quand tu es prêt. Annule à tout moment.
+            Commence gratuitement, passe au Premium quand tu es prêt. Paiement unique, accès à vie.
           </p>
-
-          {/* Toggle */}
-          <div className="pricing-toggle">
-            <button
-              className={`toggle-option ${!isYearly ? 'active' : ''}`}
-              onClick={() => setIsYearly(false)}
-            >
-              Mensuel
-            </button>
-            <button
-              className={`toggle-option ${isYearly ? 'active' : ''}`}
-              onClick={() => setIsYearly(true)}
-            >
-              Annuel
-              <span className="save-badge">-20%</span>
-            </button>
-          </div>
         </div>
 
         {/* Pricing Cards */}
-        <div className="pricing-grid">
-          {plans.map((plan, index) => (
-            <div
-              key={index}
-              className={`pricing-card ${plan.popular ? 'popular' : ''}`}
-            >
-              {plan.popular && <div className="popular-badge">Le plus populaire</div>}
+        <div className="pricing-grid pricing-grid--two">
+          {/* Free */}
+          <div className={`pricing-card ${role === 'free' && isAuthenticated ? 'current' : ''}`}>
+            {role === 'free' && isAuthenticated && <div className="current-badge">Plan actuel</div>}
 
-              <div className="pricing-card-header">
-                <h3 className="plan-name">{plan.name}</h3>
-                <p className="plan-description">{plan.description}</p>
-              </div>
-
-              <div className="pricing-card-price">
-                <div className="price-amount">
-                  {plan.price.monthly === 0 ? (
-                    <span className="free-price">Gratuit</span>
-                  ) : (
-                    <>
-                      <span className="price-value">
-                        {isYearly ? plan.price.yearly : plan.price.monthly}
-                      </span>
-                      <span className="price-currency">€</span>
-                    </>
-                  )}
-                </div>
-                <div className="price-period">
-                  {plan.price.monthly === 0
-                    ? 'Pour toujours'
-                    : isYearly
-                    ? '/mois, facturé annuellement'
-                    : '/mois'}
-                </div>
-              </div>
-
-              <ul className="plan-features">
-                {plan.features.map((feature, featureIndex) => (
-                  <li key={featureIndex} className="feature-item">
-                    <span className="feature-check">✓</span>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href={ctaHref}
-                className={`plan-cta ${plan.popular ? 'primary' : 'secondary'}`}
-              >
-                {plan.cta}
-              </Link>
+            <div className="pricing-card-header">
+              <h3 className="plan-name">Gratuit</h3>
+              <p className="plan-description">Pour découvrir DevStack</p>
             </div>
-          ))}
+
+            <div className="pricing-card-price">
+              <div className="price-amount">
+                <span className="free-price">0 €</span>
+              </div>
+              <div className="price-period">Pour toujours</div>
+            </div>
+
+            <ul className="plan-features">
+              <li className="feature-item">
+                <span className="feature-check">✓</span>
+                3 composants maximum
+              </li>
+              <li className="feature-item">
+                <span className="feature-check">✓</span>
+                Import manuel
+              </li>
+              <li className="feature-item">
+                <span className="feature-check">✓</span>
+                Export JSON
+              </li>
+              <li className="feature-item">
+                <span className="feature-check">✓</span>
+                Recherche & filtres
+              </li>
+            </ul>
+
+            <Link
+              href={freeCtaHref}
+              className="plan-cta secondary"
+            >
+              {isAuthenticated ? 'Plan actuel' : 'Commencer gratuitement'}
+            </Link>
+          </div>
+
+          {/* Premium */}
+          <div className={`pricing-card popular ${role === 'premium' && isAuthenticated ? 'current' : ''}`}>
+            <div className="popular-badge">Recommandé</div>
+            {role === 'premium' && isAuthenticated && <div className="current-badge inside">Plan actuel</div>}
+
+            <div className="pricing-card-header">
+              <h3 className="plan-name">Premium</h3>
+              <p className="plan-description">Pour les développeurs sérieux</p>
+            </div>
+
+            <div className="pricing-card-price">
+              <div className="price-amount">
+                <span className="price-value">10</span>
+                <span className="price-currency">€</span>
+              </div>
+              <div className="price-period">10 € TTC &middot; Paiement unique &middot; Accès à vie</div>
+            </div>
+
+            <ul className="plan-features">
+              <li className="feature-item">
+                <span className="feature-check">✓</span>
+                Composants illimités
+              </li>
+              <li className="feature-item">
+                <span className="feature-check">✓</span>
+                Import intelligent IA
+              </li>
+              <li className="feature-item">
+                <span className="feature-check">✓</span>
+                Export en tout format
+              </li>
+              <li className="feature-item">
+                <span className="feature-check">✓</span>
+                Génération de prompts
+              </li>
+              <li className="feature-item">
+                <span className="feature-check">✓</span>
+                Mises à jour à vie
+              </li>
+              <li className="feature-item">
+                <span className="feature-check">✓</span>
+                Support prioritaire
+              </li>
+            </ul>
+
+            <Link
+              href={role === 'premium' && isAuthenticated ? '/app' : premiumCtaHref}
+              className="plan-cta primary"
+            >
+              {role === 'premium' && isAuthenticated ? 'Plan actuel' : 'Passer au Premium'}
+            </Link>
+          </div>
         </div>
 
         {/* FAQ */}
-        <div className="faq-section">
+        <div className="faq-section" id="faq">
           <h3 className="faq-title">Questions fréquentes</h3>
 
           <div className="faq-grid">
             <div className="faq-item">
-              <h4 className="faq-question">Puis-je essayer gratuitement ?</h4>
+              <h4 className="faq-question">Le plan Gratuit est-il vraiment gratuit ?</h4>
               <p className="faq-answer">
-                Oui ! Le plan Starter est gratuit pour toujours. Le plan Pro inclut un essai
-                gratuit de 14 jours sans carte bancaire.
+                Oui, le plan Gratuit est gratuit pour toujours. Tu peux stocker jusqu&apos;à 3 composants sans aucune limite de temps.
               </p>
             </div>
 
             <div className="faq-item">
-              <h4 className="faq-question">Puis-je changer de plan ?</h4>
+              <h4 className="faq-question">Qu&apos;est-ce que le paiement unique ?</h4>
               <p className="faq-answer">
-                Absolument. Tu peux mettre à niveau ou rétrograder ton plan à tout moment depuis
-                ton tableau de bord.
+                Le Premium coûte 10 € une seule fois. Pas d&apos;abonnement, pas de frais cachés. Tu as accès à vie à toutes les fonctionnalités Premium.
+              </p>
+            </div>
+
+            <div className="faq-item">
+              <h4 className="faq-question">Puis-je passer du Gratuit au Premium ?</h4>
+              <p className="faq-answer">
+                Absolument. Tu peux upgrader à tout moment, tes composants existants sont conservés automatiquement.
               </p>
             </div>
 
             <div className="faq-item">
               <h4 className="faq-question">Mes composants sont-ils sécurisés ?</h4>
               <p className="faq-answer">
-                Oui, tous tes composants sont chiffrés et stockés de manière sécurisée. Tu restes
-                propriétaire de tout ton code.
-              </p>
-            </div>
-
-            <div className="faq-item">
-              <h4 className="faq-question">Puis-je annuler mon abonnement ?</h4>
-              <p className="faq-answer">
-                Bien sûr. Tu peux annuler à tout moment. Tu conserveras l&apos;accès jusqu&apos;à
-                la fin de ta période de facturation.
+                Oui, tous tes composants sont chiffrés et stockés de manière sécurisée. Tu restes propriétaire de tout ton code.
               </p>
             </div>
           </div>

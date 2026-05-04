@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { UserRole, ROLE_LIMITS } from '@/lib/storage';
 
 interface AppHeaderProps {
   searchQuery: string;
@@ -10,6 +11,10 @@ interface AppHeaderProps {
   onSmartImport: () => void;
   onApiKeyClick: () => void;
   componentCount: number;
+  userRole: UserRole;
+  selectionMode: boolean;
+  selectedCount: number;
+  onToggleSelectionMode: () => void;
 }
 
 export default function AppHeader({
@@ -18,6 +23,10 @@ export default function AppHeader({
   onSmartImport,
   onApiKeyClick,
   componentCount,
+  userRole,
+  selectionMode,
+  selectedCount,
+  onToggleSelectionMode,
 }: AppHeaderProps) {
   const router = useRouter();
   const [userName, setUserName] = useState('');
@@ -62,6 +71,26 @@ export default function AppHeader({
         </div>
 
         <div className="header-actions">
+          <div className="plan-badge">
+            {userRole === 'premium' ? (
+              <span className="plan-badge-premium">Premium</span>
+            ) : (
+              <span className="plan-badge-free">
+                Gratuit &middot; {componentCount}/{ROLE_LIMITS.free}
+              </span>
+            )}
+          </div>
+
+          <button
+            className={`btn-icon ${selectionMode ? 'active' : ''}`}
+            onClick={onToggleSelectionMode}
+            title={selectionMode ? 'Annuler la sélection' : 'Sélectionner'}
+          >
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </button>
+
           <button className="btn-icon" onClick={onApiKeyClick} title="Configuration IA">
             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />

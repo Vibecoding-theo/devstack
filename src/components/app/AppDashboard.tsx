@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Component, ComponentFormData } from '@/lib/types';
-import { storage } from '@/lib/storage';
+import { storage, UserRole, ROLE_LIMITS } from '@/lib/storage';
 import { initGroqFromStorage } from '@/lib/aiService';
 import AppHeader from '@/components/app/AppHeader';
 import StatsBar from '@/components/app/StatsBar';
@@ -21,10 +21,25 @@ export default function AppDashboard() {
   const [showSmartImport, setShowSmartImport] = useState(false);
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<UserRole>('free');
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     initGroqFromStorage();
     loadComponents();
+    fetch('/api/auth/session')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.authenticated) {
+          setUserRole(data.user?.role || 'free');
+          setAuthChecked(true);
+        } else {
+          window.location.href = '/auth?redirect=/app';
+        }
+      })
+      .catch(() => {
+        window.location.href = '/auth?redirect=/app';
+      });
   }, []);
 
   const loadComponents = () => {
@@ -53,6 +68,13 @@ export default function AppDashboard() {
   };
 
   const handleSmartImport = (dataList: ComponentFormData[]) => {
+    if (!storage.canAddComponents(userRole, dataList.length)) {
+      const limit = ROLE_LIMITS[userRole];
+      const remaining = storage.getRemainingSlots(userRole);
+      showNotif(`Limite atteinte : ${isFinite(limit) ? `${limit} composants max` : 'illimité'}. ${isFinite(remaining) ? `Il te reste ${remaining} place${remaining > 1 ? 's' : ''}.` : ''} Passe au Premium pour plus !`);
+      return;
+    }
+
     let count = 0;
     dataList.forEach((data) => {
       const tags = data.tags
@@ -116,6 +138,7 @@ export default function AppDashboard() {
         onSmartImport={() => setShowSmartImport(true)}
         onApiKeyClick={() => setShowApiKeyDialog(true)}
         componentCount={components.length}
+        userRole={userRole}
       />
 
       <main className="app-main">

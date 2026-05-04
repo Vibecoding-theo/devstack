@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       authenticated: true,
-      user: { name: session.name, email: session.email },
+      user: { name: session.name, email: session.email, role: session.role },
     });
 } catch {
     return NextResponse.json({ authenticated: false });

@@ -34,6 +34,7 @@ export default function HeaderLP() {
           <a href="#features">Fonctionnalités</a>
           <a href="#testimonials">Témoignages</a>
           <a href="#pricing">Tarifs</a>
+          <a href="#faq">FAQ</a>
         </nav>
 
         {/* Header Actions */}
@@ -76,6 +77,12 @@ export default function HeaderLP() {
             onClick={() => setIsMobileMenuOpen(false)}
           >
             Tarifs
+          </a>
+          <a
+            href="#faq"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            FAQ
           </a>
         </nav>
         <div className="mobile-actions">

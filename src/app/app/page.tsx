@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Component, ComponentFormData } from '@/lib/types';
-import { storage } from '@/lib/storage';
+import { storage, UserRole, ROLE_LIMITS } from '@/lib/storage';
 import { initGroqFromStorage } from '@/lib/aiService';
 import AppHeader from '@/components/app/AppHeader';
 import StatsBar from '@/components/app/StatsBar';
@@ -21,10 +21,27 @@ export default function AppPage() {
   const [showSmartImport, setShowSmartImport] = useState(false);
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<UserRole>('free');
+  const [authChecked, setAuthChecked] = useState(false);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     initGroqFromStorage();
     loadComponents();
+    fetch('/api/auth/session')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.authenticated) {
+          setUserRole(data.user?.role || 'free');
+          setAuthChecked(true);
+        } else {
+          window.location.href = '/auth?redirect=/app';
+        }
+      })
+      .catch(() => {
+        window.location.href = '/auth?redirect=/app';
+      });
   }, []);
 
   const loadComponents = () => {
@@ -53,6 +70,13 @@ export default function AppPage() {
   };
 
   const handleSmartImport = (dataList: ComponentFormData[]) => {
+    if (!storage.canAddComponents(userRole, dataList.length)) {
+      const limit = ROLE_LIMITS[userRole];
+      const remaining = storage.getRemainingSlots(userRole);
+      showNotif(`Limite atteinte : ${isFinite(limit) ? `${limit} composants max` : 'illimité'}. ${isFinite(remaining) ? `Il te reste ${remaining} place${remaining > 1 ? 's' : ''}.` : ''} Passe au Premium pour plus !`);
+      return;
+    }
+
     let count = 0;
     dataList.forEach((data) => {
       const tags = data.tags
@@ -95,9 +119,45 @@ export default function AppPage() {
     setTimeout(() => setNotification(null), 3000);
   };
 
+  const toggleSelectionMode = () => {
+    setSelectionMode((prev) => !prev);
+    setSelectedIds(new Set());
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkDelete = () => {
+    const count = selectedIds.size;
+    if (count === 0) return;
+    if (!confirm(`Supprimer ${count} composant${count > 1 ? 's' : ''} ?`)) return;
+    storage.deleteMultipleComponents([...selectedIds]);
+    setSelectionMode(false);
+    setSelectedIds(new Set());
+    loadComponents();
+    showNotif(`${count} composant${count > 1 ? 's' : ''} supprimé${count > 1 ? 's' : ''}`);
+  };
+
   const viewingComponent = viewingId
     ? components.find((c) => c.id === viewingId)
     : undefined;
+
+  if (!authChecked) {
+    return (
+      <div className="app-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+        <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>
+          <div className="payment-spinner" style={{ margin: '0 auto 16px' }} />
+          <p>Chargement...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app-page">
@@ -116,6 +176,10 @@ export default function AppPage() {
         onSmartImport={() => setShowSmartImport(true)}
         onApiKeyClick={() => setShowApiKeyDialog(true)}
         componentCount={components.length}
+        userRole={userRole}
+        selectionMode={selectionMode}
+        selectedCount={selectedIds.size}
+        onToggleSelectionMode={toggleSelectionMode}
       />
 
       <main className="app-main">
@@ -128,6 +192,9 @@ export default function AppPage() {
               components={filteredComponents}
               onView={(id) => setViewingId(id)}
               onDelete={handleDelete}
+              selectionMode={selectionMode}
+              selectedIds={selectedIds}
+              onToggleSelect={toggleSelect}
             />
           </>
         )}
@@ -142,6 +209,38 @@ export default function AppPage() {
 
       {showApiKeyDialog && (
         <ApiKeyDialog onClose={() => setShowApiKeyDialog(false)} />
+      )}
+
+      {selectionMode && (
+        <div className="bulk-action-bar">
+          <span className="bulk-count">
+            {selectedIds.size} sélectionné{selectedIds.size > 1 ? 's' : ''}
+          </span>
+          <div className="bulk-actions">
+            <button
+              className="bulk-btn select-all"
+              onClick={() => {
+                if (selectedIds.size === filteredComponents.length) {
+                  setSelectedIds(new Set());
+                } else {
+                  setSelectedIds(new Set(filteredComponents.map((c) => c.id)));
+                }
+              }}
+            >
+              {selectedIds.size === filteredComponents.length ? 'Tout désélectionner' : 'Tout sélectionner'}
+            </button>
+            <button
+              className="bulk-btn delete-all"
+              onClick={handleBulkDelete}
+              disabled={selectedIds.size === 0}
+            >
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Supprimer
+            </button>
+          </div>
+        </div>
       )}
 
       {viewingComponent && (

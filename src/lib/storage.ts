@@ -4,6 +4,13 @@ import { Component } from './types';
 
 const STORAGE_KEY = 'devstack_components';
 
+export type UserRole = 'free' | 'premium';
+
+export const ROLE_LIMITS: Record<UserRole, number> = {
+  free: 3,
+  premium: Infinity,
+};
+
 export const storage = {
   getComponents(): Component[] {
     if (typeof window === 'undefined') return [];
@@ -24,6 +31,18 @@ export const storage = {
     const components = this.getComponents();
     components.unshift(component);
     this.saveComponents(components);
+  },
+
+  canAddComponents(role: UserRole, count: number = 1): boolean {
+    const limit = ROLE_LIMITS[role];
+    if (!isFinite(limit)) return true;
+    return this.getComponents().length + count <= limit;
+  },
+
+  getRemainingSlots(role: UserRole): number {
+    const limit = ROLE_LIMITS[role];
+    if (!isFinite(limit)) return Infinity;
+    return Math.max(0, limit - this.getComponents().length);
   },
 
   updateComponent(id: string, updates: Partial<Component>): void {

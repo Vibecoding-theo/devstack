@@ -4,34 +4,28 @@ import React, { useState } from 'react';
 
 interface AuthFormProps {
   mode: 'login' | 'signup';
-  onSubmit: (data: { name?: string; email: string; password: string }) => void;
-  loading: boolean;
+  redirect: string;
+  error?: string;
 }
 
-export default function AuthForm({ mode, onSubmit, loading }: AuthFormProps) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+export default function AuthForm({ mode, redirect, error }: AuthFormProps) {
   const [showPassword, setShowPassword] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit({ name: mode === 'signup' ? name : undefined, email, password });
-  };
+  const action = mode === 'login' ? '/api/auth/signin' : '/api/auth/signup';
 
   return (
-    <form className="auth-form" onSubmit={handleSubmit}>
+    <form className="auth-form" action={action} method="POST">
+      <input type="hidden" name="redirect" value={redirect} />
+
       {mode === 'signup' && (
         <div className="auth-field">
           <label htmlFor="name">Nom</label>
           <div className="auth-input-wrapper">
             <input
               id="name"
+              name="name"
               type="text"
               className="auth-input"
               placeholder="Ton nom"
-              value={name}
-              onChange={e => setName(e.target.value)}
               required
               autoComplete="name"
             />
@@ -45,11 +39,10 @@ export default function AuthForm({ mode, onSubmit, loading }: AuthFormProps) {
         <div className="auth-input-wrapper">
           <input
             id="email"
+            name="email"
             type="email"
             className="auth-input"
             placeholder="ton@email.com"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
             required
             autoComplete="email"
           />
@@ -62,11 +55,10 @@ export default function AuthForm({ mode, onSubmit, loading }: AuthFormProps) {
         <div className="auth-input-wrapper">
           <input
             id="password"
+            name="password"
             type={showPassword ? 'text' : 'password'}
             className="auth-input"
             placeholder="••••••••"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
             required
             minLength={6}
             autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
@@ -83,16 +75,13 @@ export default function AuthForm({ mode, onSubmit, loading }: AuthFormProps) {
         </div>
       </div>
 
+      {error && <div className="auth-error">{error}</div>}
+
       <button
         type="submit"
         className="auth-submit"
-        disabled={loading}
       >
-        {loading
-          ? 'Chargement...'
-          : mode === 'login'
-            ? 'Se connecter'
-            : 'Créer un compte'}
+        {mode === 'login' ? 'Se connecter' : 'Créer un compte'}
       </button>
     </form>
   );

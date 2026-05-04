@@ -21,6 +21,7 @@ export async function initDb() {
       name VARCHAR(255) NOT NULL,
       email VARCHAR(255) UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
+      role VARCHAR(20) NOT NULL DEFAULT 'free',
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )
   `;
@@ -34,4 +35,11 @@ export async function initDb() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )
   `;
+
+  // Ajouter la colonne role si elle n'existe pas (migration)
+  try {
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'free'`;
+  } catch {
+    // Column might already exist, ignore
+  }
 }

@@ -96,6 +96,32 @@
   flex-shrink: 0;
 }
 
+/* Plan badge */
+.plan-badge {
+  display: flex;
+  align-items: center;
+  margin-right: 4px;
+}
+
+.plan-badge-premium {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #e83e8c, #9333ea);
+  color: #ffffff;
+}
+
+.plan-badge-free {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+}
+
 .btn-icon {
   width: 40px;
   height: 40px;

@@ -111,7 +111,7 @@ export async function validateSession(token: string) {
 
   const sql = getDb();
   const [session] = await sql`
-    SELECT s.user_id, s.expires_at, u.name, u.email
+    SELECT s.user_id, s.expires_at, u.name, u.email, u.role
     FROM sessions s
     JOIN users u ON u.id = s.user_id
     WHERE s.token = ${token}
@@ -125,9 +125,14 @@ export async function validateSession(token: string) {
     return null;
   }
 
-  return { userId: session.user_id, name: session.name, email: session.email };
+  return { userId: session.user_id, name: session.name, email: session.email, role: session.role || 'free' };
 }
 
 // Nom du cookie de session
 export const SESSION_COOKIE_NAME = SESSION_COOKIE;
 export const SESSION_COOKIE_MAX_AGE = SESSION_DURATION_DAYS * 24 * 60 * 60;
+
+export async function updateUserRole(userId: string, role: 'free' | 'premium') {
+  const sql = getDb();
+  await sql`UPDATE users SET role = ${role} WHERE id = ${userId}`;
+}
