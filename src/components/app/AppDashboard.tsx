@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Component, ComponentFormData } from '@/lib/types';
+import { Component, ComponentFormData, Folder } from '@/lib/types';
 import { storage, UserRole, ROLE_LIMITS } from '@/lib/storage';
 import { initGroqFromStorage } from '@/lib/aiService';
 import AppHeader from '@/components/app/AppHeader';
@@ -23,6 +23,8 @@ export default function AppDashboard() {
   const [notification, setNotification] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<UserRole>('free');
   const [authChecked, setAuthChecked] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [folders, setFolders] = useState<Folder[]>([]);
 
   useEffect(() => {
     initGroqFromStorage();
@@ -45,6 +47,7 @@ export default function AppDashboard() {
   const loadComponents = () => {
     const loaded = storage.getComponents();
     setComponents(loaded);
+    setFolders(storage.getFolders());
     applySearch(searchQuery, loaded);
   };
 
@@ -106,6 +109,11 @@ export default function AppDashboard() {
   const handleDelete = (id: string) => {
     if (confirm('Supprimer ce composant ?')) {
       storage.deleteComponent(id);
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
       loadComponents();
       setViewingId(null);
       showNotif('Composant supprimé');
@@ -115,6 +123,30 @@ export default function AppDashboard() {
   const showNotif = (message: string) => {
     setNotification(message);
     setTimeout(() => setNotification(null), 3000);
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkDelete = () => {
+    const count = selectedIds.size;
+    if (count === 0) return;
+    if (!confirm(`Supprimer ${count} composant${count > 1 ? 's' : ''} ?`)) return;
+    storage.deleteMultipleComponents([...selectedIds]);
+    setSelectedIds(new Set());
+    loadComponents();
+    showNotif(`${count} composant${count > 1 ? 's' : ''} supprimé${count > 1 ? 's' : ''}`);
+  };
+
+  const handleMoveToFolder = (componentId: string, folderId: string | null) => {
+    storage.moveComponentsToFolder([componentId], folderId);
+    loadComponents();
   };
 
   const viewingComponent = viewingId
@@ -151,6 +183,9 @@ export default function AppDashboard() {
               components={filteredComponents}
               onView={(id) => setViewingId(id)}
               onDelete={handleDelete}
+              selectedIds={selectedIds}
+              onToggleSelect={toggleSelect}
+              folders={folders}
             />
           </>
         )}
@@ -172,7 +207,40 @@ export default function AppDashboard() {
           component={viewingComponent}
           onClose={() => setViewingId(null)}
           onDelete={handleDelete}
+          folders={folders}
+          onMoveToFolder={handleMoveToFolder}
         />
+      )}
+
+      {selectedIds.size > 0 && (
+        <div className="bulk-action-bar">
+          <span className="bulk-count">
+            {selectedIds.size} sélectionné{selectedIds.size > 1 ? 's' : ''}
+          </span>
+          <div className="bulk-actions">
+            <button
+              className="bulk-btn select-all"
+              onClick={() => {
+                if (selectedIds.size === filteredComponents.length) {
+                  setSelectedIds(new Set());
+                } else {
+                  setSelectedIds(new Set(filteredComponents.map((c) => c.id)));
+                }
+              }}
+            >
+              {selectedIds.size === filteredComponents.length ? 'Tout désélectionner' : 'Tout sélectionner'}
+            </button>
+            <button
+              className="bulk-btn delete-all"
+              onClick={handleBulkDelete}
+            >
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Supprimer ({selectedIds.size})
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

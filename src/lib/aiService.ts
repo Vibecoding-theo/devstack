@@ -1,6 +1,7 @@
 'use client';
 
 import Groq from 'groq-sdk';
+import { Component } from './types';
 
 // Utiliser la clé API depuis localStorage ou demander à l'utilisateur
 let groq: Groq | null = null;
@@ -257,4 +258,85 @@ Intègre ce composant dans ce projet en respectant les contraintes suivantes :
 2. Indique-moi comment le rendre réutilisable et scalable
 3. Donne-moi les dépendances nécessaires et comment les installer
 4. Propose des exemples d'utilisation concrets`;
+}
+
+// Génère un prompt qui fusionne tous les composants d'un dossier en un seul composant unifié
+export async function generateFolderPromptWithAI(components: Component[], folderName: string): Promise<string> {
+  if (!isApiKeySet()) {
+    return generateBasicFolderPrompt(components, folderName);
+  }
+
+  const componentsList = components.map((c, i) =>
+    `### Composant ${i + 1} : ${c.name} (${c.language})\n**Description :** ${c.description}\n\`\`\`${c.language}\n${c.code}\n\`\`\``
+  ).join('\n\n');
+
+  try {
+    const response = await groq!.chat.completions.create({
+      messages: [
+        {
+          role: 'system',
+          content: `Tu es un architecte logiciel expert. Ta mission est d'analyser un ensemble de composants fournis et de générer UN SEUL prompt complet qui permet de les fusionner en un composant unifié, cohérent et fonctionnel.
+
+Le prompt généré doit :
+1. Expliquer clairement comment tous les composants fonctionnent ensemble
+2. Proposer une architecture unifiée qui combine leurs fonctionnalités
+3. Fournir le code du composant fusionné complet
+4. Gérer les conflits (doublons de styles, fonctions similaires, etc.)
+5. Lister toutes les dépendances nécessaires
+6. Inclure des exemples d'utilisation du composant final
+
+Contraintes obligatoires :
+- **Intégration** : Le composant final doit être fonctionnel, avec les imports/exports corrects
+- **Design & UI** : Design cohérent, responsive, performant
+- **Code** : Propre, typé, bien structuré, avec des commentaires clairs
+
+Réponds en français, de manière claire et structurée.`
+        },
+        {
+          role: 'user',
+          content: `Voici les ${components.length} composants du dossier "${folderName}" à fusionner :
+
+${componentsList}
+
+Génère un prompt complet pour créer un composant unifié qui combine toutes ces fonctionnalités.`
+        }
+      ],
+      model: 'llama-3.3-70b-versatile',
+      temperature: 0.7,
+      max_tokens: 3000
+    });
+
+    return response.choices[0]?.message?.content || generateBasicFolderPrompt(components, folderName);
+  } catch (error) {
+    console.warn('Génération de prompt dossier IA échouée:', error);
+    return generateBasicFolderPrompt(components, folderName);
+  }
+}
+
+function generateBasicFolderPrompt(components: Component[], folderName: string): string {
+  const componentsList = components.map((c, i) =>
+    `${i + 1}. **${c.name}** (${c.language}) — ${c.description}`
+  ).join('\n');
+
+  const codeBlocks = components.map(c =>
+    `### ${c.name}\n\`\`\`${c.language}\n${c.code}\n\`\`\``
+  ).join('\n\n');
+
+  return `Je souhaite fusionner les ${components.length} composants suivants du dossier "${folderName}" en un seul composant unifié :
+
+${componentsList}
+
+${codeBlocks}
+
+**Contraintes d'intégration :**
+- **Fusion** : Combine toutes les fonctionnalités en un composant cohérent et fonctionnel
+- **Design & UI** : Design unifié, responsive, performant
+- **Code** : Propre, bien structuré, réutilisable
+
+**Ta tâche :**
+1. Analyse chaque composant et identifie les liens entre eux
+2. Propose une architecture unifiée
+3. Fournis le code du composant fusionné complet
+4. Liste les dépendances nécessaires
+5. Donne des exemples d'utilisation concrets`;
 }

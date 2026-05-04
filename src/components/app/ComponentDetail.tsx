@@ -1,16 +1,18 @@
 'use client';
 
-import { Component } from '@/lib/types';
+import { Component, Folder } from '@/lib/types';
 import { useState } from 'react';
-import { generatePromptWithAI, isApiKeySet } from '@/lib/aiService';
+import { generatePromptWithAI } from '@/lib/aiService';
 
 interface ComponentDetailProps {
   component: Component;
   onClose: () => void;
   onDelete: (id: string) => void;
+  folders: Folder[];
+  onMoveToFolder: (componentId: string, folderId: string | null) => void;
 }
 
-export default function ComponentDetail({ component, onClose, onDelete }: ComponentDetailProps) {
+export default function ComponentDetail({ component, onClose, onDelete, folders, onMoveToFolder }: ComponentDetailProps) {
   const [prompt, setPrompt] = useState<string | null>(null);
   const [promptLoading, setPromptLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -70,6 +72,20 @@ export default function ComponentDetail({ component, onClose, onDelete }: Compon
           <div className="detail-section">
             <div className="detail-section-title">Description</div>
             <p className="detail-desc">{component.description}</p>
+          </div>
+
+          <div className="detail-section">
+            <div className="detail-section-title">Dossier</div>
+            <select
+              className="detail-folder-select"
+              value={component.folderId || ''}
+              onChange={(e) => onMoveToFolder(component.id, e.target.value || null)}
+            >
+              <option value="">Non classé</option>
+              {folders.map((f) => (
+                <option key={f.id} value={f.id}>{f.name}</option>
+              ))}
+            </select>
           </div>
 
           {(component.tags.length > 0 || (component.dependencies && component.dependencies.length > 0)) && (

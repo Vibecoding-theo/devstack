@@ -1,8 +1,9 @@
 'use client';
 
-import { Component } from './types';
+import { Component, Folder } from './types';
 
 const STORAGE_KEY = 'devstack_components';
+const FOLDERS_KEY = 'devstack_folders';
 
 export type UserRole = 'free' | 'premium';
 
@@ -93,5 +94,66 @@ export const storage = {
     } catch (e) {
       return { success: false, count: 0, error: 'JSON invalide' };
     }
-  }
+  },
+
+  // ===== FOLDERS =====
+
+  getFolders(): Folder[] {
+    if (typeof window === 'undefined') return [];
+    try {
+      const data = localStorage.getItem(FOLDERS_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  },
+
+  saveFolders(folders: Folder[]): void {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(FOLDERS_KEY, JSON.stringify(folders));
+  },
+
+  addFolder(folder: Folder): void {
+    const folders = this.getFolders();
+    folders.push(folder);
+    this.saveFolders(folders);
+  },
+
+  updateFolder(id: string, updates: Partial<Folder>): void {
+    const folders = this.getFolders();
+    const index = folders.findIndex(f => f.id === id);
+    if (index !== -1) {
+      folders[index] = { ...folders[index], ...updates };
+      this.saveFolders(folders);
+    }
+  },
+
+  deleteFolder(id: string): void {
+    const folders = this.getFolders().filter(f => f.id !== id);
+    this.saveFolders(folders);
+    // Move components from this folder back to unclassified
+    const components = this.getComponents();
+    components.forEach(c => {
+      if (c.folderId === id) {
+        delete c.folderId;
+      }
+    });
+    this.saveComponents(components);
+  },
+
+  moveComponentsToFolder(ids: string[], folderId: string | null): void {
+    const components = this.getComponents();
+    const idSet = new Set(ids);
+    components.forEach(c => {
+      if (idSet.has(c.id)) {
+        if (folderId) {
+          c.folderId = folderId;
+        } else {
+          delete c.folderId;
+        }
+        c.updatedAt = new Date().toISOString();
+      }
+    });
+    this.saveComponents(components);
+  },
 };

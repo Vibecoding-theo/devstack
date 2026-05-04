@@ -1,14 +1,14 @@
 'use client';
 
-import { Component } from '@/lib/types';
+import { Component, Folder } from '@/lib/types';
 
 interface ComponentGridProps {
   components: Component[];
   onView: (id: string) => void;
   onDelete: (id: string) => void;
-  selectionMode: boolean;
   selectedIds: Set<string>;
   onToggleSelect: (id: string) => void;
+  folders: Folder[];
 }
 
 const langClass: Record<string, string> = {
@@ -22,31 +22,38 @@ const langClass: Record<string, string> = {
   other: 'lang-other',
 };
 
-export default function ComponentGrid({ components, onView, onDelete, selectionMode, selectedIds, onToggleSelect }: ComponentGridProps) {
+export default function ComponentGrid({ components, onView, onDelete, selectedIds, onToggleSelect, folders }: ComponentGridProps) {
   if (components.length === 0) return null;
+
+  const inSelectionMode = selectedIds.size > 0;
 
   return (
     <div className="component-grid">
       {components.map((comp) => {
         const isSelected = selectedIds.has(comp.id);
+        const folder = comp.folderId ? folders.find(f => f.id === comp.folderId) : null;
 
         return (
           <div
             key={comp.id}
-            className={`component-card ${selectionMode && isSelected ? 'card-selected' : ''}`}
-            onClick={() => selectionMode ? onToggleSelect(comp.id) : onView(comp.id)}
+            className={`component-card ${isSelected ? 'card-selected' : ''}`}
+            onClick={() => inSelectionMode ? onToggleSelect(comp.id) : onView(comp.id)}
           >
-            {selectionMode && (
-              <div className="card-checkbox">
-                <div className={`checkbox-visual ${isSelected ? 'checked' : ''}`}>
-                  {isSelected && (
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </div>
+            <div
+              className="card-checkbox"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleSelect(comp.id);
+              }}
+            >
+              <div className={`checkbox-visual ${isSelected ? 'checked' : ''}`}>
+                {isSelected && (
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
               </div>
-            )}
+            </div>
 
             <div className="card-header">
               <span className={`card-lang-badge ${langClass[comp.language] || 'lang-other'}`}>
@@ -86,6 +93,17 @@ export default function ComponentGrid({ components, onView, onDelete, selectionM
 
             <div className="card-footer">
               <div className="card-tags">
+                {folder && (
+                  <span
+                    className="card-folder-badge"
+                    style={{ background: `${folder.color}15`, color: folder.color }}
+                  >
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="10" height="10">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                    </svg>
+                    {folder.name}
+                  </span>
+                )}
                 {comp.tags.slice(0, 3).map((tag) => (
                   <span key={tag} className="card-tag">#{tag}</span>
                 ))}
