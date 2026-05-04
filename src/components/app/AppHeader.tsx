@@ -61,6 +61,7 @@ export default function AppHeader({
             placeholder={`Rechercher dans ${componentCount} composant${componentCount !== 1 ? 's' : ''}...`}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
+            autoComplete="off"
           />
         </div>
 
