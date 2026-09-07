@@ -1,15 +1,39 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/useAuth';
 
 export default function Pricing({ id }: { id?: string }) {
   const { isAuthenticated, role } = useAuth();
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const freeCtaHref = isAuthenticated ? '/app' : '/auth?redirect=/app';
 
   const premiumCtaHref = isAuthenticated ? '/payment' : '/auth?redirect=/payment';
+
+  const faqs = [
+    {
+      question: 'Le plan Gratuit est-il vraiment gratuit ?',
+      answer:
+        'Oui, le plan Gratuit est gratuit pour toujours. Tu peux stocker jusqu\'à 3 composants sans aucune limite de temps.',
+    },
+    {
+      question: 'Qu\'est-ce que le paiement unique ?',
+      answer:
+        'Le Premium coûte 10 € une seule fois. Pas d\'abonnement, pas de frais cachés. Tu as accès à vie à toutes les fonctionnalités Premium.',
+    },
+    {
+      question: 'Puis-je passer du Gratuit au Premium ?',
+      answer:
+        'Absolument. Tu peux upgrader à tout moment, tes composants existants sont conservés automatiquement.',
+    },
+    {
+      question: 'Mes composants sont-ils sécurisés ?',
+      answer:
+        'Oui, tous tes composants sont chiffrés et stockés de manière sécurisée. Tu restes propriétaire de tout ton code.',
+    },
+  ];
 
   return (
     <section id={id} className="pricing-section">
@@ -137,33 +161,22 @@ export default function Pricing({ id }: { id?: string }) {
           <h3 className="faq-title">Questions fréquentes</h3>
 
           <div className="faq-grid">
-            <div className="faq-item">
-              <h4 className="faq-question">Le plan Gratuit est-il vraiment gratuit ?</h4>
-              <p className="faq-answer">
-                Oui, le plan Gratuit est gratuit pour toujours. Tu peux stocker jusqu&apos;à 3 composants sans aucune limite de temps.
-              </p>
-            </div>
-
-            <div className="faq-item">
-              <h4 className="faq-question">Qu&apos;est-ce que le paiement unique ?</h4>
-              <p className="faq-answer">
-                Le Premium coûte 10 € une seule fois. Pas d&apos;abonnement, pas de frais cachés. Tu as accès à vie à toutes les fonctionnalités Premium.
-              </p>
-            </div>
-
-            <div className="faq-item">
-              <h4 className="faq-question">Puis-je passer du Gratuit au Premium ?</h4>
-              <p className="faq-answer">
-                Absolument. Tu peux upgrader à tout moment, tes composants existants sont conservés automatiquement.
-              </p>
-            </div>
-
-            <div className="faq-item">
-              <h4 className="faq-question">Mes composants sont-ils sécurisés ?</h4>
-              <p className="faq-answer">
-                Oui, tous tes composants sont chiffrés et stockés de manière sécurisée. Tu restes propriétaire de tout ton code.
-              </p>
-            </div>
+            {faqs.map((faq, index) => (
+              <div key={index} className={`faq-item ${openFaq === index ? 'open' : ''}`}>
+                <button
+                  type="button"
+                  className="faq-question"
+                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                  aria-expanded={openFaq === index}
+                >
+                  <span>{faq.question}</span>
+                  <span className="faq-chevron">+</span>
+                </button>
+                <div className="faq-answer-wrapper">
+                  <p className="faq-answer">{faq.answer}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

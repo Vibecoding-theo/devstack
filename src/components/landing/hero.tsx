@@ -68,6 +68,8 @@ export default function Hero() {
 
             {/* 3D Cubes */}
             <div className="cubes-container">
+              <div className="cube-orbit cube-orbit-1" />
+              <div className="cube-orbit cube-orbit-2" />
               <div className="cube cube-top">
                 <div className="cube-face front" />
                 <div className="cube-face back" />
@@ -126,7 +128,7 @@ export default function Hero() {
               </div>
               <div className="card-content">
                 <div className="code-content">
-                  <span className="comment">// Component</span>
+                  <span className="comment">{'// Component'}</span>
                   <br />
                   <span className="keyword">
                     export
