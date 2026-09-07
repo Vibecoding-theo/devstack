@@ -250,7 +250,7 @@ export default function Features({ id }: { id?: string }) {
               <div className="demo-stats">
                 <div className="stat-item">
                   <span className="stat-value">
-                    {activeTab === 0 ? '1,234' : activeTab === 1 ? '98%' : '15'}
+                    {activeTab === 0 ? '239' : activeTab === 1 ? '98%' : '15'}
                   </span>
                   <span className="stat-label">
                     {activeTab === 0 ? 'Composants' : activeTab === 1 ? 'Précision' : 'Collections'}
